@@ -1,8 +1,5 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
-* Студент: [Валерия](https://up.htmlacademy.ru/javascript/13/user/536199).
-* Наставник: [Филипп Шамсиев](https://up.htmlacademy.ru/javascript/13/user/70260).
-
 ---
 
 _Не удаляйте и не обращайте внимание на файлы:_<br>
