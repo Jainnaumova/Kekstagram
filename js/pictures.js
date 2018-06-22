@@ -9,6 +9,10 @@ var PICTURE_HEIGHT = 35;
 
 var ESC_KEYCODE = 27;
 
+var STEP_RESIZE = 25;
+var MIN_IMAGE_SIZE = 25;
+var MAX_IMAGE_SIZE = 100;
+
 var PHOTO_COMMENTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -193,6 +197,7 @@ uploadFile.addEventListener('change', openOverlay);
 function openOverlay() {
   if (checkOverlayIsHidden()) {
     imgUploadOverlay.classList.remove('hidden');
+    resizeImg(100);
     document.addEventListener('keydown', buttonCancelUploadEscPressHandler);
     buttonUploadCancel.addEventListener('click', imgUploadClickHandler);
     effectsList.addEventListener('click', effectsListClickHandler);
@@ -210,7 +215,6 @@ function imgUploadClickHandler() {
   scalePin.removeEventListener('mouseup', scalePinMouseupHandler);
   uploadFile.value = '';
 }
-
 
 function closePopup(popup) {
   popup.classList.add('hidden');
@@ -235,8 +239,34 @@ function buttonBigPictureCancelEscPressHandler(evt) {
   }
 }
 
+// Transformation uploaded Pictire
 
+var resizeControl = imgUploadOverlay.querySelector('.resize__control--value');
+var imgUpload = imgUploadOverlay.querySelector('.img-upload__preview');
+var imgUploadPicture = imgUpload.querySelector('img');
 
+// changing of size uploaded Picture
+function resizeImg(step) {
+  var resizeControlInt = +resizeControl.value.slice(0, -1);
+  var size = resizeControlInt + step;
+
+  if (size < MIN_IMAGE_SIZE) {
+    size = MIN_IMAGE_SIZE;
+  } else {
+    if (size > MAX_IMAGE_SIZE) {
+      size = MAX_IMAGE_SIZE;
+    }
+  }
+  resizeControl.value = (size) + '%';
+  imgUploadPicture.style.transform = 'scale(' + size / MAX_IMAGE_SIZE + ')';
+}
+
+imgUploadOverlay.querySelector('.resize__control--minus').addEventListener('click', function() {
+  resizeImg(-STEP_RESIZE);
+})
+imgUploadOverlay.querySelector('.resize__control--plus').addEventListener('click', function() {
+  resizeImg(STEP_RESIZE);
+})
 
 function effectsListClickHandler() {
 
