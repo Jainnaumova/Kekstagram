@@ -268,9 +268,52 @@ imgUploadOverlay.querySelector('.resize__control--plus').addEventListener('click
   resizeImg(STEP_RESIZE);
 })
 
-function effectsListClickHandler() {
+// editing uploaded Picture - filters
+var scaleSlider = document.querySelector('.img-upload__scale');
+var scalePin = scaleSlider.querySelector('.scale__pin');
+var scaleLine = scaleSlider.querySelector('.scale__line');
+var scaleLevel = scaleSlider.querySelector('.scale__level');
+var scaleValue = scaleSlider.querySelector('.scale__value');
+var effects = effectsList.querySelectorAll('.effects__radio');
+
+function scalePinMouseupHandler() {
+  switch (selectEffect()) {
+    case 'chrome':
+      setImgUploadFilter('grayscale', 0, 1);
+      break;
+    case 'sepia':
+      setImgUploadFilter('sepia', 0, 1);
+      break;
+    case 'marvin':
+      setImgUploadFilter('invert', 0, 100, '%');
+      break;
+    case 'phobos':
+      setImgUploadFilter('blur', 0, 3, 'px');
+      break;
+    case 'hot':
+      setImgUploadFilter('brightness', 1, 3);
+      break;
+    case 'original':
+      scaleSlider.classList.add('.hidden');
+      imgUploadPicture.removeAttribute('class');
+  }
+}
+
+function showSlider() {
+  if (scaleSlider.classList.contains('hidden')) {
+    scaleSlider.classList.remove('hidden');
+  }
+}
+
+// add class to uploaded Picture
+function setClassEffect() {
+  
+}
+
+function selectEffect() {
 
 }
-function scalePinMouseupHandler() {
+
+function effectsListClickHandler() {
 
 }
