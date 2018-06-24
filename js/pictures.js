@@ -240,7 +240,6 @@ function buttonBigPictureCancelEscPressHandler(evt) {
 }
 
 // Transformation uploaded Pictire
-
 var resizeControl = imgUploadOverlay.querySelector('.resize__control--value');
 var imgUpload = imgUploadOverlay.querySelector('.img-upload__preview');
 var imgUploadPicture = imgUpload.querySelector('img');
@@ -306,14 +305,51 @@ function showSlider() {
 }
 
 // add class to uploaded Picture
-function setClassEffect() {
-  
+function setClassEffect(filter) {
+  if (!imgUploadPicture.classList.contains(filter)) {
+    showSlider();
+    imgUploadPicture.removeAttribute('class');
+    imgUploadPicture.classList.add('effects__preview--' + filter);
+  }
 }
 
+// set filter on uploaded Picture
+function setImgUploadFilter(filter, min, max, dimention) {
+  showSlider();
+  var scale = (scalePin.offsetLeft * (max - min) / scaleLine.offsetWidth) + min;
+  imgUploadPicture.style.filter = filter + '(' + scale + (dimention ? dimention : '') + ')';
+  scaleValue.value = scale;
+}
+
+// set default Pin position
+function setDefaultPositionPin() {
+  scalePin.style.left = '100%';
+  scaleLevel.style.width = '100%';
+  scaleValue.value = 100;
+  imgUploadPicture.style.filter = '';
+}
+
+// check effect of uploaded Pictire
 function selectEffect() {
-
+  var checkedEffect;
+  for (var i = 0; i < effects.length; i++) {
+    if (effects[i].checked) {
+      checkedEffect = effects[i].value;
+    }
+  }
+  return checkedEffect;
 }
 
-function effectsListClickHandler() {
-
+// set effect on the uploaded Picture
+function effectsListClickHandler(evt) {
+  var evtValue = evt.target.value;
+  if (evtValue === 'original') {
+    scaleSlider.classList.add('.hidden');
+    imgUploadPicture.style.filter = '';
+    imgUploadPicture.removeAttribute('class');
+    scaleValue.value = 0;
+  } else {
+      setDefaultPositionPin();
+      setClassEffect(selectEffect());
+  }
 }
