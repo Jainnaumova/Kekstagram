@@ -202,7 +202,9 @@ function openOverlay() {
     buttonUploadCancel.addEventListener('click', imgUploadClickHandler);
     effectsList.addEventListener('click', effectsListClickHandler);
     scalePin.addEventListener('mouseup', scalePinMouseupHandler);
-    // add reset filters & hide slider
+    // reset filters & hide slider
+    imgUploadPicture.removeAttribute('class');
+    scaleSlider.classList.add('hidden');
   }
 }
 
@@ -289,11 +291,12 @@ function scalePinMouseupHandler() {
     case 'phobos':
       setImgUploadFilter('blur', 0, 3, 'px');
       break;
-    case 'hot':
+    case 'heat':
       setImgUploadFilter('brightness', 1, 3);
       break;
-    case 'original':
-      scaleSlider.classList.add('.hidden');
+    case 'none':
+      scaleSlider.classList.add('hidden');
+      debugger
       imgUploadPicture.removeAttribute('class');
   }
 }
@@ -306,7 +309,7 @@ function showSlider() {
 
 // add class to uploaded Picture
 function setClassEffect(filter) {
-  if (!imgUploadPicture.classList.contains(filter)) {
+  if (!imgUploadPicture.classList.contains('effects__preview--' + filter)) {
     showSlider();
     imgUploadPicture.removeAttribute('class');
     imgUploadPicture.classList.add('effects__preview--' + filter);
@@ -343,8 +346,8 @@ function selectEffect() {
 // set effect on the uploaded Picture
 function effectsListClickHandler(evt) {
   var evtValue = evt.target.value;
-  if (evtValue === 'original') {
-    scaleSlider.classList.add('.hidden');
+  if (evtValue === 'none') {
+    scaleSlider.classList.add('hidden');
     imgUploadPicture.style.filter = '';
     imgUploadPicture.removeAttribute('class');
     scaleValue.value = 0;
