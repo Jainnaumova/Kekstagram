@@ -832,7 +832,10 @@ main {
   border-radius: 5px;
 }
 
-
+/* errorClass */
+.text__error {
+  border: 2px solid red;
+}
 /* Кнопка отправки формы */
 
 .img-upload__submit {
