@@ -205,13 +205,14 @@ function openOverlay() {
     document.addEventListener('keydown', buttonCancelUploadEscPressHandler);
     buttonUploadCancel.addEventListener('click', imgUploadClickHandler);
     effectsList.addEventListener('click', effectsListClickHandler);
-    scalePin.addEventListener('mouseup', scalePinMouseupHandler);
+    scalePin.addEventListener('mousedown', scalePinMousedownHandler);
     // reset filters & hide slider
     imgUploadPicture.removeAttribute('class');
     scaleSlider.classList.add('hidden');
     scaleValue.value = 0;
     // validation of hashtags
     hashtagsUpload.addEventListener('blur', hashtagSubmitHandler);
+
     hashtagsUpload.addEventListener('keydown', function() {
       hashtagsUpload.setCustomValidity('');
     });
@@ -278,7 +279,7 @@ function imgUploadClickHandler() {
   document.removeEventListener('keydown', buttonCancelUploadEscPressHandler);
   buttonUploadCancel.removeEventListener('click', imgUploadClickHandler);
   effectsList.removeEventListener('click', effectsListClickHandler);
-  scalePin.removeEventListener('mouseup', scalePinMouseupHandler);
+  scalePin.removeEventListener('mouseup', setFilterValue);
   form.removeEventListener('submit', hashtagSubmitHandler);
   uploadFile.value = '';
 }
@@ -341,27 +342,48 @@ var scaleLevel = scaleSlider.querySelector('.scale__level');
 var scaleValue = scaleSlider.querySelector('.scale__value');
 var effects = effectsList.querySelectorAll('.effects__radio');
 
-function scalePinMouseupHandler() {
-  switch (selectEffect()) {
+// create object with filter's parameters during slider moving
+function createEffectParameters(filter, min, max, dimention) {
+  return {
+    filter: filter,
+    min: min,
+    max: max,
+    dimention: dimention
+  };
+}
+
+// set slader filter's PositionPin and effects
+function setFilterValue(left, width) {
+  var selectedEffect = selectEffect();
+  if (selectedEffect === 'none') {
+    scaleSlider.classList.add('hidden');
+    imgUploadPicture.removeAttribute('class');
+    return;
+  }
+
+  var effectParameters = {};
+
+  switch (selectedEffect) {
     case 'chrome':
-      setImgUploadFilter('grayscale', 0, 1);
+      effectParameters = createEffectParameters('grayscale', 0, 1);
       break;
     case 'sepia':
-      setImgUploadFilter('sepia', 0, 1);
+      effectParameters = createEffectParameters('sepia', 0, 1);
       break;
     case 'marvin':
-      setImgUploadFilter('invert', 0, 100, '%');
+      effectParameters = createEffectParameters('invert', 0, 100, '%');
       break;
     case 'phobos':
-      setImgUploadFilter('blur', 0, 3, 'px');
+      effectParameters = createEffectParameters('blur', 0, 3, 'px');
       break;
     case 'heat':
-      setImgUploadFilter('brightness', 1, 3);
+      effectParameters = createEffectParameters('brightness', 1, 3);
       break;
-    case 'none':
-      scaleSlider.classList.add('hidden');
-      imgUploadPicture.removeAttribute('class');
+    default:
+      throw new Error ('Undefined filter' + selectedEffect)
   }
+  var scale = left * (effectParameters.max - effectParameters.min) / width + effectParameters.min;
+  setImgUploadFilter(effectParameters.filter, scale, effectParameters.dimention);
 }
 
 function showSlider() {
@@ -380,11 +402,11 @@ function setClassEffect(filter) {
 }
 
 // set filter on uploaded Picture
-function setImgUploadFilter(filter, min, max, dimention) {
+function setImgUploadFilter(filter, scale, dimention) {
   showSlider();
-  var scale = (scalePin.offsetLeft * (max - min) / scaleLine.offsetWidth) + min;
+
   imgUploadPicture.style.filter = filter + '(' + scale + (dimention ? dimention : '') + ')';
-  scaleValue.value = scale;
+
 }
 
 // set default Pin position
@@ -418,4 +440,42 @@ function effectsListClickHandler(evt) {
       setDefaultPositionPin();
       setClassEffect(selectEffect());
   }
+}
+
+// calculation of effect's deep according of position scale's Pin
+var startX = null;
+
+function scalePinMousemoveHandler(moveEvt) {
+  moveEvt.preventDefault();
+
+  var shiftX = startX - moveEvt.clientX;
+  startX = moveEvt.clientX;
+  // debugger
+  // calculation of slider Position
+  var scaleLineWidth = scaleLine.offsetWidth;
+
+  var scalePinCoordsX = scalePin.offsetLeft - shiftX;
+  if (scalePinCoordsX >= 0 && scalePinCoordsX <= scaleLineWidth) {
+    scalePin.style.left = scalePinCoordsX + 'px';
+    scaleLevel.style.width = scalePinCoordsX + 'px';
+    setFilterValue(scalePinCoordsX, scaleLineWidth);
+    var valuePercent = scalePinCoordsX * 100 / scaleLineWidth;
+    scaleValue.value = Math.round(valuePercent);
+  }
+}
+
+function scalePinMouseupHandler(upEvt) {
+  upEvt.preventDefault();
+
+  startX = upEvt.clientX;
+  document.removeEventListener('mousemove', scalePinMousemoveHandler);
+  document.removeEventListener('mouseup', scalePinMouseupHandler);
+}
+
+function scalePinMousedownHandler(evt) {
+  evt.preventDefault();
+
+  startX = evt.clientX;
+  document.addEventListener('mousemove', scalePinMousemoveHandler);
+  document.addEventListener('mouseup', scalePinMouseupHandler);
 }
